@@ -1,0 +1,22 @@
+# ==========================================
+# Full Stack Open - Universal Ignore Rules
+# ==========================================
+
+# Exercise 4.1: Blog List, step 1
+node_modules
+.pnpm-store
+
+# Ignore the entire local API test folder
+requests/
+
+# Ignore environment variables (CRITICAL)
+.env
+.env.local
+
+# Ignore OS generated files (optional but good practice)
+.DS_Store
+Thumbs.db
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json

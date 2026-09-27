@@ -1,0 +1,122 @@
+/* Full Stack open, The University of Helsinki
+a. Exercises 5.1 - 5.4 Blog List Frontend
+   Url : https://fullstackopen.com/en/part5/login_in_frontend#exercises-5-1-5-4
+b. Exercises 5.24–5.28 Routed Blogs
+   Url : https://fullstackopen.com/en/part5/react_router_ui_frameworks#exercises-5-24-5-28
+Created on 2026-08-29 16:15 HKT */
+
+* {
+  font-family: "Verdana", "Helvetica", "Calibri", sans-serif;
+}
+
+html {
+  margin: 0.5rem;
+}
+
+input {
+  margin-left: 1rem;
+  margin-bottom: 0.4rem;
+}
+
+#loginButton,
+#createButton {
+  padding: 0.2rem 0.8rem;
+}
+
+#logoutButton,
+#loginLink,
+#createLink {
+  padding: 0.2rem 0.8rem;
+  margin-left: 0.8rem;
+}
+
+.toggle-button,
+.btn-secondary {
+  padding: 0.2rem 0.8rem;
+  margin-bottom: 0.8rem;
+}
+
+#viewButton,
+#likeButton {
+  padding: 0.1rem 0.6rem;
+  margin-left: 0.8rem;
+  margin-top: 0.2rem;
+  margin-bottom: 0.2rem;
+}
+
+#removeButton {
+  padding: 0.1rem 0.6rem;
+  margin: 0.2rem 0 0.2rem 0.8rem;
+}
+
+#removeButton:hover {
+  background-color: #f8bbd0;
+}
+
+.error {
+  color: #bf1722;
+  background: #f3f3f3;
+  padding: 0.4rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  border-color: #bf1722;
+  border-width: 0.15rem;
+  border-radius: 0.4rem;
+  border-style: solid;
+}
+
+.success {
+  color: #339900;
+  background: #f3f3f3;
+  padding: 0.4rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  border-color: #339900;
+  border-width: 0.15rem;
+  border-radius: 0.4rem;
+  border-style: solid;
+}
+
+#createNew {
+  margin-bottom: 1.5rem;
+}
+
+th {
+  font-weight: normal;
+  text-align: left;
+  padding-right: 1rem;
+}
+
+ul,
+li {
+  line-height: 130%;
+  font-family: monospace;
+  font-size: 1rem;
+  margin: 0.1rem 0 0.1rem 0;
+}
+
+li:hover {
+  background-color: rgb(235, 235, 235);
+}
+
+.blog_row {
+  font-family: monospace;
+  font-size: 1rem;
+  font-weight: bold;
+  white-space: pre;
+  margin-top: 0.2rem;
+  text-decoration-line: none;
+}
+
+.blog_details,
+#numLikes {
+  font-family: monospace;
+  font-size: 1rem;
+  white-space: pre;
+  margin: 0.2rem 0 0.2rem 1rem;
+}
+
+.alert {
+  margin: 25% 0 0 40%;
+  align-items: center;
+}

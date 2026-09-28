@@ -137,12 +137,13 @@ const anotherListWithMultiBlogs = [
 
 
 // exercise 4.3: test dummy function always returns 1
-test('dummy returns one', () => {
-  const blogs = []
+// exercise 11.20: comment out 'dummy' test as it does not need in Part 11
+// test('dummy returns one', () => {
+//   const blogs = []
 
-  const result = listHelper.dummy(blogs)
-  assert.strictEqual(result, 1)
-})
+//   const result = listHelper.dummy(blogs)
+//   assert.strictEqual(result, 1)
+// })
 
 // exervise 4.4: test function returns total sum of likes
 describe('total likes', () => {

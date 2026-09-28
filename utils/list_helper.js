@@ -17,9 +17,10 @@
 
 
 // exercise 4.3: dummy function always returns 1
-const dummy = (blogs) => {
-  return 1
-}
+// exercise 11.21: comment out dummy function for passing ESLint check
+// const dummy = (blogs) => {
+//   return 1
+// }
 
 // exervise 4.4: receives a list of blog posts as a parameter.
 // returns the total sum of likes in all blog posts.
@@ -90,7 +91,8 @@ const mostLikes = (blogs) => {
 }
 
 module.exports = {
-  dummy,
+  // exercise 11.20: comment out 'dummy' as it does not need in Part 11
+  // dummy
   totalLikes,
   favoriteBlog,
   mostBlogs,

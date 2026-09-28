@@ -1,0 +1,2 @@
+# Stop Git or Windows text editors from converting them back to CRLF
+* text=auto eol=lf

@@ -8,7 +8,28 @@ import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 
+
 export default [
+
+  // exercise 11.21: Recognize Node.js globals in Playwright config
+  {
+    files: ['playwright.config.js'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
+  },
+  // exercise 11.21: Recognize Vitest globals in test files
+  {
+    files: ['src/**/*.test.jsx', 'src/**/*.test.js'],
+    languageOptions: {
+      globals: {
+        ...globals.vitest,
+      },
+    },
+  },
+
   { ignores: ['dist'] },
   {
     files: ['**/*.{js,jsx}'],

@@ -38,8 +38,8 @@ app.use(express.json()) //activate the json-parser
 
 // Workaround for resolve SRV records failure
 // by using CommonJS (require)
-const dns = require('node:dns/promises')
-dns.setServers(['1.1.1.1', '8.8.8.8'])
+// const dns = require('node:dns/promises')
+// dns.setServers(['1.1.1.1', '8.8.8.8'])
 
 // Exercise 4.20: register token middleware before all routers
 const middleware = require('./utils/middleware')

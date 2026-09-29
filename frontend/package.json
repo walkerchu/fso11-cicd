@@ -1,7 +1,8 @@
 {
   "name": "bloglist-frontend",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Full Stack Open Part 11 - Exercise 21 Frontend",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,7 +11,7 @@
     "preview": "vite preview",
     "test-vitest": "vitest run",
     "test": "playwright test",
-    "test:report": "playwright show-report"
+    "test-report": "playwright show-report"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

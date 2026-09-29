@@ -20,6 +20,8 @@
 //    -> refactor taking token to a middleware
 // 8. exercise 5.18: Blog List End To End Testing, step 2 (Sept 12, 2026)
 //    -> register testing router only if env is 'test'
+// 9. exercise 11.21 (Sept 30, 2026)
+//    -> remove app.get('/') and replace with static middleware
 
 const express = require('express')
 const mongoose = require('mongoose')
@@ -62,9 +64,13 @@ const connectDB = async () => {
 connectDB()
 
 
-// Site : <baseURL>:3003
-app.get('/', async (request, response) => {
-  response.send('<h2 style=\'font-family: Verdana, sans-serif;\'>Welcome to the Blog List</h2>')
+// Exercise 11.21: replace app.get('/') by static middleware:
+app.use(express.static('frontend/dist'))
+
+
+// Exercise 11.21 : Health check endpoint for Render deployment checks
+app.get('/health', (req, res) => {
+  res.send('ok')
 })
 
 // Exercise 4.15: Site -> <baseURL>:3003/api/users

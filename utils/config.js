@@ -17,6 +17,7 @@ require('dotenv').config({ path: '.env.local' })
 const logger = require('./logger')
 const PORT = process.env.PORT || 3003
 
+/* exercise 11.21 command out this block for troubleshooting Render issue
 // exercise 4.1 : build the MongoDB connection url
 const db_user = process.env.MONGODB_USER
 const db_password = process.env.MONGODB_PASSWORD
@@ -32,6 +33,19 @@ logger.info('Node Env:', process.env.NODE_ENV)
 logger.info('Database:', db_name )
 
 const MONGODB_URI = `mongodb+srv://${db_user}:${db_password}@${db_cluster}/${db_name}?appName=${db_name}`
+ */
+
+// Determine database name for local environment
+const db_name = process.env.NODE_ENV === 'test'
+  ? process.env.TEST_MONGODB_DB_NAME
+  : process.env.PROD_MONGODB_DB_NAME
+
+// Use direct MONGODB_URI if provided (Render), otherwise construct it (Local)
+const MONGODB_URI = process.env.MONGODB_URI ||
+  `mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWORD}@${process.env.MONGODB_CLUSTER}/${db_name}?appName=${db_name}`
+
+logger.info('Node Env:', process.env.NODE_ENV)
+logger.info('Database:', process.env.MONGODB_URI ? 'Render MONGODB_URI' : db_name)
 
 
 module.exports = { MONGODB_URI, PORT }

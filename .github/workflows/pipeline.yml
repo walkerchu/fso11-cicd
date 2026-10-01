@@ -1,0 +1,186 @@
+# Full Stack open: Continuous integration (part 11)
+# by The University of Helsinki
+# url : https://courses.mooc.fi/org/uh-cs/courses/full-stack-open-continuous-integration
+# created: Sept 22, 2026
+
+# Change Logs :
+# 1. Exercise 11.5: implement a "Lint" workflow
+# 2. Exercise 11.7: add build and test commands
+# 3. Exercise 11.9: add simple end-to-end tests
+# 4. Exercise 11.11: make deployments automatic to Rander
+# 5. Exercise 11.13: add pull request triggers
+# 6. Exercise 11.14: run deployment only for main branch
+# 7. Exercise 11.15: automatically increase (bump) the version
+# 8. Exercise 11.16: not deploy if commit msg contains #skip
+# 9. Exercise 11.18: set up Discord notification by using webhook
+# 10. Exercise 11.19: splite workflow to logical jobs
+# 11. Exercise 11.21: adjust workflow to suit new Blog App repo
+
+name: Deployment pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize]
+  workflow_dispatch:
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6.1.0
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: "pnpm"
+
+      - name: Install backend dependencies
+        run: pnpm install
+
+      - name: Install frontend dependencies
+        run: pnpm --dir frontend install
+
+      - name: Check backend style
+        run: pnpm run lint:backend
+
+      - name: Check frontend style
+        run: pnpm run lint:frontend
+
+      - name: Run backend test
+        run: pnpm run test:backend
+        env:
+          MONGODB_URI: ${{ secrets.TEST_MONGODB_URI }}
+          SECRET: ${{ secrets.MONGODB_SECRET }}
+
+      - name: Run frontend integration test
+        run: pnpm run test-vitest:frontend
+
+      - name: Run frontend build
+        run: pnpm run build:frontend
+
+      - name: Cache Playwright Browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            playwright-${{ runner.os }}-
+
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install chromium --with-deps
+
+      - name: Run Playwright tests
+        run: pnpm test:frontend
+        env:
+          MONGODB_URI: ${{ secrets.TEST_MONGODB_URI }}
+          SECRET: ${{ secrets.MONGODB_SECRET }}
+
+      - name: Upload Playwright Report
+        uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+          if-no-files-found: ignore # Prevents warnings if the folder doesn't exist
+
+  deployment:
+    needs: [build_and_test]
+    runs-on: ubuntu-latest
+
+    if: >
+      github.event_name == 'push' &&
+      !contains(toJson(github.event.commits.*.message), '#skip')
+
+    steps:
+      # exercise 11.14: add 'if' to ensure this step is executed only
+      # if the code is being merged or push to the main branch
+      - run: curl ${{ secrets.RENDER_BLOG_APP_DEPLOY_HOOK }}
+
+      - name: Wait for Render Deployment Health Check
+        uses: jtalk/url-health-check-action@v5
+        with:
+          url: https://fso11-cicd-blog-app.onrender.com/health
+          max-attempts: 10
+          retry-delay: 10s
+          follow-redirect: false
+
+  tag_and_notification:
+    needs: [deployment]
+    runs-on: ubuntu-latest
+    # exercise 11.14 & 11.16: ensure merge to main AND no #skip keyword
+
+    if: >
+      github.event_name == 'push' &&
+      !contains(toJson(github.event.commits.*.message), '#skip')
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: "0"
+      - name: Bump version and push tag
+        # exercise 11.15: auto increase (bump) the version
+        # use most recent version of github-tag-action as exercise advised
+        uses: anothrNick/github-tag-action@1.75.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEFAULT_BUMP: patch
+          DRY_RUN: false
+
+      - name: Set short git commit SHA
+        id: vars
+        run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
+      - name: Send Discord Success Notification
+        uses: sarisia/actions-status-discord@v1.16.0
+        with:
+          webhook: ${{secrets.DISCORD_WEBHOOK}}
+          username: Fullstack Part 11 Hook
+          color: 0x0fbf3e
+          status: success
+          title: "✅ New production version is deployed"
+          description: |
+            **Branch:** ${{ github.ref_name }}
+            **Commit:**  ${{ steps.vars.outputs.SHORT_SHA }}
+            **Message:** ${{ github.event.head_commit.message }}
+            **Author:** ${{ github.actor }}
+            **Job:** ${{ github.job }}
+
+            [View Commit](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
+
+  notify_failure:
+    needs: [build_and_test, deployment]
+    runs-on: ubuntu-latest
+    if: >
+      always() &&
+      (needs.build_and_test.result == 'failure' || 
+      needs.deployment.result == 'failure')
+    steps:
+      - name: Set short git commit SHA
+        id: vars
+        run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
+      - name: Send Discord Failure Notification
+        uses: sarisia/actions-status-discord@v1.16.0
+        with:
+          webhook: ${{secrets.DISCORD_WEBHOOK}}
+          username: Fullstack Part 11 Hook
+          color: 0xfe4c25
+          status: failure
+          title: "❌ Pipeline encountered an error"
+          description: |
+            **Branch:** ${{ github.ref_name }}
+            **Commit:**  ${{ steps.vars.outputs.SHORT_SHA }}
+            **Message:** ${{ github.event.head_commit.message }}
+            **Author:** ${{ github.actor }}
+            **Job:** ${{ github.job }}
+
+            [View Commit](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})

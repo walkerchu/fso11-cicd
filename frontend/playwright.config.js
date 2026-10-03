@@ -37,15 +37,15 @@ export default defineConfig({
     {
       command: 'pnpm run start-test:backend', // Command to start backend server in test mode
       cwd: '..',
-      url: 'http://127.0.0.1:3003/api/blogs', // exercise 11.21: change localhost to ip addr
+      url: 'http://127.0.0.1:3003/health',
       reuseExistingServer: !process.env.CI,
       timeout: 120 * 1000,
       stdout: 'pipe',
       stderr: 'pipe',
     },
     {
-      command: 'pnpm run dev -- --host', // Command to start frontend dev/preview server
-      url: 'http://127.0.0.1:5173', // exercise 11.21: change localhost to ip addr
+      command: 'pnpm run dev',
+      url: 'http://127.0.0.1:5173',
       reuseExistingServer: !process.env.CI,
       timeout: 120 * 1000,
       stdout: 'pipe',
@@ -100,4 +100,3 @@ export default defineConfig({
   //   reuseExistingServer: !process.env.CI,
   // },
 })
-

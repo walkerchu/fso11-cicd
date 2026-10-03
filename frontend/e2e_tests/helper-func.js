@@ -24,9 +24,17 @@ const createBlog = async (page, blog) => {
   const createPageHeader = page.locator('h3', 'create new')
   await createPageHeader.waitFor({ state: 'visible', timeout: 10000 })
 
-  await page.getByRole('textbox',{ name: 'title' }).fill(blog.title)
-  await page.getByRole('textbox',{ name: 'author' }).fill(blog.author)
-  await page.getByRole('textbox',{ name: 'url' }).fill(blog.url)
+  const inputTitle = await page.getByRole('textbox',{ name: 'title' })
+  await inputTitle.waitFor({ state: 'visible', timeout: 10000 })
+  await inputTitle.fill(blog.title)
+
+  const inputAuthor = await page.getByRole('textbox',{ name: 'author' })
+  await inputAuthor.waitFor({ state: 'visible', timeout: 10000 })
+  await inputAuthor.fill(blog.author)
+
+  const inputUrl = await page.getByRole('textbox',{ name: 'url' })
+  await inputUrl.waitFor({ state: 'visible', timeout: 10000 })
+  await inputUrl.fill(blog.url)
 
   await page.getByRole('button', { name: 'create' }).click()
   const blogLink = page.locator('a.blog_row').filter({ hasText: blog.title })

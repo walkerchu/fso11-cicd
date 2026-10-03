@@ -9,7 +9,7 @@
 // 2. exercise 11.21: Your own pipeline (Oct 1, 2026)
 //    -> fix issues after combining frontend and backend
 
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import BlogForm from './BlogForm'
 import userEvent from '@testing-library/user-event'
 
@@ -45,5 +45,33 @@ describe('exercise 5.16 tests', () => {
     expect(mockCreateHandler.mock.calls).toHaveLength(1)
     expect(mockCreateHandler.mock.calls[0][0]).toEqual(newBlog)
 
+  })
+
+  // exercise 11.21: verify flake cases are eliminated
+  test('clears the form after blog creation completes', async () => {
+    const user = userEvent.setup()
+    let finishCreate
+    const createPromise = new Promise(resolve => {
+      finishCreate = resolve
+    })
+    const mockCreateHandler = vi.fn(() => createPromise)
+
+    render(<BlogForm createBlog={mockCreateHandler} />)
+
+    await user.type(screen.getByRole('textbox', { name: /title/i }), newBlog.title)
+    await user.type(screen.getByRole('textbox', { name: /author/i }), newBlog.author)
+    await user.type(screen.getByRole('textbox', { name: /url/i }), newBlog.url)
+    await user.click(screen.getByRole('button', { name: /create/i }))
+
+    expect(screen.getByRole('textbox', { name: /title/i })).toHaveValue(newBlog.title)
+    expect(screen.getByRole('textbox', { name: /author/i })).toHaveValue(newBlog.author)
+    expect(screen.getByRole('textbox', { name: /url/i })).toHaveValue(newBlog.url)
+
+    finishCreate()
+    await waitFor(() => {
+      expect(screen.getByRole('textbox', { name: /title/i })).toHaveValue('')
+      expect(screen.getByRole('textbox', { name: /author/i })).toHaveValue('')
+      expect(screen.getByRole('textbox', { name: /url/i })).toHaveValue('')
+    })
   })
 })

@@ -62,8 +62,6 @@ import {
 import * as styles from './materialStyles'
 
 
-// import './index.css'
-
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('')

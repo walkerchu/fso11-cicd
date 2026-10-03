@@ -21,5 +21,7 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: './testSetup.js',
+    // exercise 11.21: only match unit/component test files inside src/
+    include: ['src/**/*.test.{js,jsx,ts,tsx}'],
   }
 })

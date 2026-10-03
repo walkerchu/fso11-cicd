@@ -6,6 +6,8 @@
 // Change log :
 // 1. exercise 5.16: Blog List Tests, step 4 (Sept 11, 2026)
 //    -> check event handler receives right details when create new
+// 2. exercise 11.21: Your own pipeline (Oct 1, 2026)
+//    -> fix issues after combining frontend and backend
 
 import { render, screen } from '@testing-library/react'
 import BlogForm from './BlogForm'
@@ -28,16 +30,16 @@ describe('exercise 5.16 tests', () => {
 
     render(<BlogForm createBlog={mockCreateHandler} />)
 
-    const titleInput = screen.getByRole('textbox', { name: /title:/i })
+    const titleInput = screen.getByRole('textbox', { name: /title/i })
     await user.type(titleInput, newBlog.title)
 
-    const authorInput = screen.getByRole('textbox', { name: /author:/i })
+    const authorInput = screen.getByRole('textbox', { name: /author/i })
     await user.type(authorInput, newBlog.author)
 
-    const urlInput = screen.getByRole('textbox', { name: /url:/i })
+    const urlInput = screen.getByRole('textbox', { name: /url/i })
     await user.type(urlInput, newBlog.url)
 
-    const createButton = screen.queryByRole('button', { name: /create/i })
+    const createButton = screen.getByRole('button', { name: /create/i })
     await user.click(createButton)
 
     expect(mockCreateHandler.mock.calls).toHaveLength(1)

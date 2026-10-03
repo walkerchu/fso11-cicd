@@ -66,7 +66,8 @@ const BlogDetails = ({ blogs, updateLikes, loggedUsername, onDelete }) => {
           className="blog_details"
           sx={{ color:'grey.800', mt: 1, mb: 2 }}
         >
-          <span id='numLikes'>{blog.likes}</span> likes
+          {/* exercise 11.21: change 'id' to 'data-testid' */}
+          <span data-testid='numLikes'>{blog.likes}</span> likes
         </Typography>
 
         {/* show like button only user already logged in */}

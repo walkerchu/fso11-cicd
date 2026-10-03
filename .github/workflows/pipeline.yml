@@ -84,8 +84,10 @@ jobs:
         run: pnpm test
         working-directory: frontend # exercise 11.21 added
         env:
+          TEST_MONGODB_URI: ${{ secrets.TEST_MONGODB_URI }}
           MONGODB_URI: ${{ secrets.TEST_MONGODB_URI }}
           SECRET: ${{ secrets.MONGODB_SECRET }}
+          PORT: 3003
 
       - name: Upload Playwright Report
         uses: actions/upload-artifact@v4

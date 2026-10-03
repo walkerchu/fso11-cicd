@@ -80,7 +80,8 @@ jobs:
         working-directory: frontend # exercise 11.21 added
 
       - name: Run Playwright tests
-        run: pnpm test:frontend
+        # exercise 11.21: use package.json sit in /frontend subfolder
+        run: pnpm test
         working-directory: frontend # exercise 11.21 added
         env:
           MONGODB_URI: ${{ secrets.TEST_MONGODB_URI }}

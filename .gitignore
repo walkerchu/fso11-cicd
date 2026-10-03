@@ -8,6 +8,7 @@ node_modules
 
 # Ignore the entire local API test folder
 requests/
+personal_note/
 
 # Ignore environment variables (CRITICAL)
 .env

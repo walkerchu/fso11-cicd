@@ -8,12 +8,13 @@
 //    -> fix the end-to-end tests created with Playwright
 // 2. exercise 5.31: styled blogs, step 3 (Sept 20, 2026)
 //    -> fix broken tests after implementing Material UI
-
+// 3. exercise 11.21: Your own pipeline (Oct 3, 2026)
+//    -> fix issues after combining frontend and backend
 
 import { test, expect } from '@playwright/test'
 
 const testUsers = [
-  { name: 'Michael Chan', username: 'root', password: 'secret', },
+  { name: 'Michael Chan', username: 'michael', password: 'chan', },
   { name: 'Canny Har', username: 'canny',password: 'har', }
 ]
 
@@ -33,17 +34,25 @@ const loginWith = async (page, username, password) => {
 const createBlog = async (page, blog) => {
 
   await page.getByRole('link', { name: 'new blog' }).click()
-  await page.waitForURL('http://localhost:5173/create')
+  await page.waitForURL(/\/create$/)
+  await expect(page.getByRole('heading', { name: /create new/i })).toBeVisible()
 
-  await page.getByRole('textbox',{ name: 'title' }).fill(blog.title)
-  await page.getByRole('textbox',{ name: 'author' }).fill(blog.author)
-  await page.getByRole('textbox',{ name: 'url' }).fill(blog.url)
+  const inputTitle = await page.getByRole('textbox',{ name: 'title' })
+  await inputTitle.waitFor({ state: 'visible', timeout: 10000 })
+  await inputTitle.fill(blog.title)
+
+  const inputAuthor = await page.getByRole('textbox',{ name: 'author' })
+  await inputAuthor.waitFor({ state: 'visible', timeout: 10000 })
+  await inputAuthor.fill(blog.author)
+
+  const inputUrl = await page.getByRole('textbox',{ name: 'url' })
+  await inputUrl.waitFor({ state: 'visible', timeout: 10000 })
+  await inputUrl.fill(blog.url)
 
   await page.getByRole('button', { name: 'create' }).click()
-  await page.locator('.blog_row').filter({ hasText: `${blog.title}` }).waitFor()
+  const blogLink = page.locator('a.blog_row').filter({ hasText: blog.title })
+  await blogLink.waitFor({ state: 'visible', timeout: 10000 })
 }
-
-
 
 test.describe('before login - login page', () => {
 
@@ -55,7 +64,7 @@ test.describe('before login - login page', () => {
 
   test('page title is correct', async ({ page }) => {
     const title = await page.title()
-    expect(title).toBe('Full Stack open - part 5')
+    expect(title).toBe('Full Stack Open - part 11')
   })
 
   test('top menu label is correct', async ({ page }) => {
@@ -84,31 +93,42 @@ test.describe('before login - login page', () => {
 
 test.describe('before login - blog page', () => {
 
-  test.beforeEach(async ({ page, request }) => {
-
-    await request.post('http://localhost:3003/api/testing/reset')
-    await request.post('http://localhost:3003/api/users', { data: testUsers[0] })
-
-    await page.goto('http://localhost:5173/login')
-    await loginWith(page, testUsers[0].username, testUsers[0].password)
-    await page.waitForURL('http://localhost:5173')
-    for (const blog of testBlogs) {
-      await createBlog(page, blog)
-    }
-    await page.getByRole('button', { name: 'logout' }).click()
-    await page.waitForURL('http://localhost:5173/login')
+  test('top menu label is correct - before login', async ({ page }) => {
 
     console.log(`running: ${test.info().title}`)
-    await page.goto('http://localhost:5173')
-  })
 
-  test('top menu label is correct', async ({ page }) => {
+    await page.goto('http://localhost:5173/login')
+    await expect(page.getByRole('heading', { name: /log in to application/i })).toBeVisible()
+
     const topMenu = page.getByTestId('nav-bar')
     await expect(topMenu).toContainText('blogs')
     await expect(topMenu).toContainText('login')
   })
 
-  test('blog contents are correct', async ({ page }) => {
+  test('blog contents are correct - before login', async ({ page, request }) => {
+
+    console.log(`running: ${test.info().title}`)
+
+    await request.post('http://localhost:3003/api/testing/reset')
+    await request.post('http://localhost:3003/api/users', { data: testUsers[0] })
+
+    await page.goto('http://localhost:5173/login')
+    await expect(page.getByRole('heading', { name: /log in to application/i })).toBeVisible()
+
+    // login and create blogs for preparing test data
+    await loginWith(page, testUsers[0].username, testUsers[0].password)
+    await expect(page.getByRole('button', { name: 'logout' })).toBeVisible()
+    for (const blog of testBlogs) {
+      await createBlog(page, blog)
+    }
+
+    // logout and fall back to login page
+    await page.getByRole('button', { name: 'logout' }).click()
+    await expect(page.getByRole('heading', { name: /log in to application/i })).toBeVisible()
+
+    // go to blog list page to verify correctness of blog details
+    await page.getByRole('link', { name: 'blogs' }).click()
+    await expect(page.getByRole('heading', { name: /blogs/i })).toBeVisible()
 
     for (const blog of testBlogs) {
       const blogLink = page.
@@ -127,7 +147,7 @@ test.describe('before login - blog page', () => {
       await expect(page.getByRole('button', { name: 'remove' })).not.toBeVisible()
 
       await page.locator('#blogsLink').click()
-      await page.waitForURL('http://localhost:5173')
+      await page.waitForURL(url => url.pathname === '/')
     }
 
   })
@@ -151,7 +171,7 @@ test.describe('after login - login page', () => {
     const topMenu = page.getByTestId('nav-bar')
     await expect(topMenu).toContainText('blogs')
     await expect(topMenu).toContainText('new blog')
-    await page.waitForURL('http://localhost:5173')
+    await page.waitForURL(url => url.pathname === '/')
     await expect(topMenu.getByRole('button', { name: 'logout' })).toBeVisible()
   })
 
@@ -161,7 +181,7 @@ test.describe('after login - login page', () => {
     const topMenu = page.getByTestId('nav-bar')
     await expect(topMenu.getByRole('button', { name: 'logout' })).not.toBeVisible()
 
-    await expect(page).toHaveURL('http://localhost:5173/login')
+    await expect(page).toHaveURL(/\/login$/)
 
     const errorDiv = page.locator('.error')
     await expect(errorDiv).toContainText('wrong username or password')
@@ -184,7 +204,7 @@ test.describe('after login - blog page - logged in user = author', () => {
 
     await page.goto('http://localhost:5173/login')
     await loginWith(page, testUsers[0].username, testUsers[0].password)
-    await page.waitForURL('http://localhost:5173')
+    await expect(page.getByRole('button', { name: 'logout' })).toBeVisible()
     for (const blog of testBlogs) {
       await createBlog(page, blog)
     }
@@ -213,7 +233,7 @@ test.describe('after login - blog page - logged in user = author', () => {
       await expect(page.getByRole('button', { name: 'remove' })).toBeVisible()
 
       await page.locator('#blogsLink').click()
-      await page.waitForURL('http://localhost:5173')
+      await page.waitForURL(url => url.pathname === '/')
     }
   })
 
@@ -224,8 +244,6 @@ test.describe('after login - blog page - logged in user = author', () => {
       author: 'Canny Har',
       url: 'http://www.canny.hk', }
 
-    await page.getByRole('link', { name: 'new blog' }).click()
-    await page.waitForURL('http://localhost:5173/create')
     await createBlog(page, newBlog)
 
     const successDiv = page.locator('.success')
@@ -248,15 +266,13 @@ test.describe('after login - blog page - logged in user = author', () => {
         { name:`${testBlogs[0].title} by ${testBlogs[0].author}` } )
       .click()
 
-    page.waitForLoadState('domcontentloaded')
-
     await expect(page.getByTestId('blogTitle')).toContainText(testBlogs[0].title)
     await expect(page.getByTestId('blogAuthor')).toContainText(testBlogs[0].author)
 
-    const initLikes = parseInt(await page.locator('span#numLikes').innerText(), 10)
+    const initLikes = parseInt(await page.getByTestId('numLikes').innerText(), 10)
 
     await page.getByRole('button', { name: 'like' }).click()
-    await expect(page.locator('span#numLikes')).toContainText(`${initLikes + 1}`)
+    await expect(page.getByTestId('numLikes')).toContainText(`${initLikes + 1}`)
   })
 
   test('logged-in user can delete blogs', async ({ page }) => {
@@ -267,20 +283,20 @@ test.describe('after login - blog page - logged in user = author', () => {
         { name:`${testBlogs[0].title} by ${testBlogs[0].author}` } )
       .click()
 
-    page.waitForLoadState('domcontentloaded')
+    await page.waitForLoadState('domcontentloaded')
 
     await expect(page.getByTestId('blogTitle')).toContainText(testBlogs[0].title)
     await expect(page.getByTestId('blogAuthor')).toContainText(testBlogs[0].author)
 
     // setup listener FIRST dialog
-    page.on('dialog', async dialog => {
+    page.once('dialog', async dialog => {
       expect(dialog.message()).toBe(`Remove blog: ${testBlogs[0].title} by ${testBlogs[0].author} ?`)
       expect(dialog.type()).toBe('confirm')
       await dialog.accept() // accepts the confirm window
     })
 
     await page.getByRole('button', { name: 'remove' }).click()
-    await page.waitForURL('http://localhost:5173')
+    await page.waitForURL(url => url.pathname === '/')
 
     await expect(page
       .getByRole('link', { name:`${testBlogs[0].title} by ${testBlogs[0].author}` } ))
@@ -301,16 +317,16 @@ test.describe('after login - blog page - logged in user != author', () => {
     // Log in as 'root' to create a blog post
     await page.goto('http://localhost:5173/login')
     await loginWith(page, testUsers[0].username, testUsers[0].password)
-    await page.waitForURL('http://localhost:5173')
+    await expect(page.getByRole('button', { name: 'logout' })).toBeVisible()
     await createBlog(page, testBlogs[0])
 
     // Log out 'root'
     await page.getByRole('button', { name: 'logout' }).click()
-    await page.waitForURL('http://localhost:5173/login')
+    await page.waitForURL(/\/login$/)
 
     // Log in as 'canny'
     await loginWith(page, testUsers[1].username, testUsers[1].password)
-    await page.waitForURL('http://localhost:5173')
+    await expect(page.getByRole('button', { name: 'logout' })).toBeVisible()
   })
 
   test('non-author sees like button but remove button is hidden', async ({ page }) => {

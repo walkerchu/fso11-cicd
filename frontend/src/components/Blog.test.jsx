@@ -10,11 +10,14 @@
 //    -> check clicking biew button will show details
 // 3. exercise 5.15: Blog List Tests, step 3 (Sept 10, 2026)
 //    -> check like button clicks twice
-
+// 4. exercise 11.21: Your own pipeline (Oct 1, 2026)
+//    -> fix issues after combining frontend and backend
 
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router-dom' // added by exercise 11.21
 import Blog from './Blog'
+import { expect } from 'vitest'
 
 let user // for user event session
 let updateLikes
@@ -22,6 +25,7 @@ let blog
 
 beforeEach(() => {
   blog = {
+    id: '60d5ec49f1b2c81234567890',
     title: 'The Clockwork Soup Spoon',
     author: 'Barnaby Quigley',
     url: 'www.Barnaby.Quigley.org.hk',
@@ -34,9 +38,12 @@ beforeEach(() => {
   user = userEvent.setup()
   updateLikes = vi.fn()
 
-  render(<Blog blog={blog} updateLikes={updateLikes} loggedUsername="johndoe"/>)
+  // exercise 11.21 : added </MemoryRouter>
+  render(
+    <MemoryRouter>
+      <Blog blog={blog} updateLikes={updateLikes} loggedUsername="johndoe"/>
+    </MemoryRouter>)
 })
-
 
 // Exercise 5.13: check title / author / url / likes
 describe('exercise 5.13 tests', () => {
@@ -61,8 +68,20 @@ describe('exercise 5.13 tests', () => {
   })
 })
 
+// Exercise 11.21: add tests based on new UI
+describe('exercise 11.21 additional tests', () => {
+
+  test('link destination is correct', () => {
+    const link = screen.getByRole('link', { name: new RegExp(blog.title, 'i') })
+    expect(link.href).toContain(`/blogs/${blog.id}`)
+  })
+})
+
+
+
 // Exercise 5.14: check clicking view/hide button
-describe('exercise 5.14 tests', () => {
+// Exercose 11.21: skip as respective UI is removed
+describe.skip('exercise 5.14 tests', () => {
 
   test('button label change to hide after click', async () => {
     const viewButton = await screen.queryByRole('button', { name: /view/i })
@@ -86,7 +105,8 @@ describe('exercise 5.14 tests', () => {
 })
 
 // Exercise 5.15: check like button clicks twice
-describe('exercise 5.15 tests', () => {
+// Exercose 11.21: skip as respective UI is removed
+describe.skip('exercise 5.15 tests', () => {
 
   test('click like button twice', async () => {
 
@@ -102,5 +122,4 @@ describe('exercise 5.15 tests', () => {
   })
 
 })
-
 

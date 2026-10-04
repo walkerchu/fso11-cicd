@@ -35,6 +35,9 @@ export default defineConfig({
     actionTimeout: 60000,        // action (click/fill) timeout 60s
     navigationTimeout: 120000,   // navigation timeout 120s
   },
+  expect: {
+    timeout: 10000, // 10 seconds for all expect assertions
+  },
   webServer: [
     {
       command: 'pnpm run start-test:backend', // Command to start backend server in test mode

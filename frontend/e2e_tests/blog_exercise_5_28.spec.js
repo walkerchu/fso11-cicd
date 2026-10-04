@@ -15,13 +15,13 @@ import { test, expect } from '@playwright/test'
 import { loginWith, createBlog } from './helper-func'
 
 const testUsers = [
-  { name: 'Michael Chan', username: 'michael', password: 'chan', },
-  { name: 'Canny Har', username: 'canny',password: 'har', }
+  { name: 'Mary Chan', username: 'mary', password: 'chan', },
+  { name: 'Kitene Lee', username: 'kitene',password: 'lee', }
 ]
 
 const testBlogs = [
-  { title: 'Mosquito Bites', author: 'Michael Chan', url: 'http://www.mosquito.com', },
-  { title: 'Cooking Past', author: 'Michael Chan', url: 'http://www.cooking.com', },
+  { title: 'Mosquito Bites', author: 'Mary Chan', url: 'http://www.mosquito.com', },
+  { title: 'Cooking Past', author: 'Mary Chan', url: 'http://www.cooking.com', },
 ]
 
 test.describe('before login - login page', () => {
@@ -116,8 +116,8 @@ test.describe('before login - blog page', () => {
       await expect(page.locator('text=0 likes')).toBeVisible()
       await expect(page.locator(`text=Added by ${blog.author}`)).toBeVisible()
 
-      await expect(page.getByRole('button', { name: 'like' } )).not.toBeVisible()
-      await expect(page.getByRole('button', { name: 'remove' })).not.toBeVisible()
+      await expect(page.getByTestId('likeButton')).not.toBeVisible()
+      await expect(page.getByTestId('removeButton')).not.toBeVisible()
 
       await page.getByTestId('blogsLink').click()
       await page.waitForURL(url => url.pathname === '/')
@@ -162,7 +162,7 @@ test.describe('after login - login page', () => {
     await expect(errorDiv).not.toHaveCSS('border-style', 'solid')
 
     // Give a 1000ms buffer to account for hardware/execution variance
-    await expect(errorDiv).toBeHidden({ timeout: 6000 })
+    await expect(errorDiv).toBeHidden()
   })
 
 }) // end of test.describe
@@ -200,8 +200,8 @@ test.describe('after login - blog page - logged in user = author', () => {
       await expect(page.locator('text=0 likes')).toBeVisible()
       await expect(page.locator(`text=Added by ${blog.author}`)).toBeVisible()
 
-      await expect(page.getByRole('button', { name: 'like' } )).toBeVisible()
-      await expect(page.getByRole('button', { name: 'remove' })).toBeVisible()
+      await expect(page.getByTestId('likeButton')).toBeVisible()
+      await expect(page.getByTestId('removeButton')).toBeVisible()
 
       await page.getByTestId('blogsLink').click()
       await page.waitForURL(url => url.pathname === '/')
@@ -225,7 +225,7 @@ test.describe('after login - blog page - logged in user = author', () => {
     await expect(successDiv).not.toHaveCSS('border-style', 'solid')
 
     // Give a 1000ms buffer to account for hardware/execution variance
-    await expect(successDiv).toBeHidden({ timeout: 6000 })
+    await expect(successDiv).toBeHidden()
   })
 
 
@@ -238,7 +238,7 @@ test.describe('after login - blog page - logged in user = author', () => {
 
     const initLikes = parseInt(await page.getByTestId('numLikes').innerText(), 10)
 
-    await page.getByRole('button', { name: 'like' }).click()
+    await page.getByTestId('likeButton').click()
     await expect(page.getByTestId('numLikes')).toContainText(`${initLikes + 1}`)
   })
 
@@ -246,7 +246,7 @@ test.describe('after login - blog page - logged in user = author', () => {
 
     // click 'Mosquito Bites by Michael Chan'
     const blogRowLink = page.getByTestId('blogRowLink').filter({ hasText: testBlogs[0].title })
-    await blogRowLink.waitFor({ state: 'visible', timeout: 30000 })
+    await blogRowLink.waitFor({ state: 'visible' })
     await blogRowLink.click()
 
     await page.waitForURL('**/blogs/**')
@@ -262,7 +262,7 @@ test.describe('after login - blog page - logged in user = author', () => {
       await dialog.accept() // accepts the confirm window
     })
 
-    await page.getByRole('button', { name: 'remove' }).click()
+    await page.getByTestId('removeButton').click()
     await page.waitForURL(url => url.pathname === '/')
 
     await expect(page
@@ -307,8 +307,8 @@ test.describe('after login - blog page - logged in user != author', () => {
     await expect(page.getByTestId('blogTitle')).toContainText(testBlogs[0].title)
     await expect(page.getByTestId('blogAuthor')).toContainText(testBlogs[0].author)
 
-    await expect(page.getByRole('button', { name: 'like' })).toBeVisible()
-    await expect(page.getByRole('button', { name: 'remove' })).not.toBeVisible()
+    await expect(page.getByTestId('likeButton')).toBeVisible()
+    await expect(page.getByTestId('removeButton')).not.toBeVisible()
   })
 
 })

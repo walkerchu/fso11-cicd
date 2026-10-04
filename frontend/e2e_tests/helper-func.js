@@ -20,31 +20,31 @@ const loginWith = async (page, username, password) => {
 }
 
 const createBlog = async (page, blog) => {
-  await expect(page.getByTestId('createLink')).toBeVisible({ timeout: 30000 })
+  await expect(page.getByTestId('createLink')).toBeVisible()
   await page.getByTestId('createLink').click()
-  await page.waitForURL(/\/create$/)
-  await expect(page.getByTestId('createNewHeader')).toBeVisible({ timeout: 30000 })
+  // await page.waitForURL(/\/create$/)
+  await expect(page.getByTestId('createNewHeader')).toBeVisible()
 
   const inputTitle = page.getByTestId('titleInput' )
-  await inputTitle.waitFor({ state: 'visible', timeout: 30000 })
+  // await inputTitle.waitFor({ state: 'visible' })
   await inputTitle.fill(blog.title)
 
   const inputAuthor = page.getByTestId('authorInput' )
-  await inputAuthor.waitFor({ state: 'visible', timeout: 30000 })
+  // await inputAuthor.waitFor({ state: 'visible' })
   await inputAuthor.fill(blog.author)
 
   const inputUrl = page.getByTestId('urlInput' )
-  await inputUrl.waitFor({ state: 'visible', timeout: 30000 })
+  // await inputUrl.waitFor({ state: 'visible' })
   await inputUrl.fill(blog.url)
 
-  await page.getByRole('button', { name: 'create' }).click()
+  await page.getByTestId('createButton').click()
 
   // Wait for backend response before checking UI
   await page.waitForResponse(resp =>
     resp.url().includes('/api/blogs') && resp.status() === 201)
 
   const blogLink = page.getByTestId('blogRowLink').filter({ hasText: blog.title })
-  await blogLink.waitFor({ state: 'visible', timeout: 30000 })
+  await blogLink.waitFor({ state: 'visible' })
 }
 
 export { loginWith, createBlog }

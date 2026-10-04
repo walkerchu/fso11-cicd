@@ -20,15 +20,15 @@ import { loginWith, createBlog } from './helper-func'
 test.describe('test for exercise 5.23', () => {
 
   const testUser = {
-    name: 'Michael Chan',
-    username: 'michael',
-    password: 'chan',
+    name: 'Freda Motten',
+    username: 'freda',
+    password: 'motten',
   }
 
   const testBlogs =[
-    { title: 'Pancakes', author: 'Michael Chan', url: 'http://www.pancakes.hk', like:4 },
-    { title: 'Carbuncles', author: 'Michael Chan', url: 'http://www.carbuncles.hk', like:1 },
-    { title: 'Deception', author: 'Michael Chan', url: 'http://www.deception.hk', like:2 },
+    { title: 'Pancakes', author: 'Freda Motten', url: 'http://www.pancakes.hk', like:4 },
+    { title: 'Carbuncles', author: 'Freda Motten', url: 'http://www.carbuncles.hk', like:1 },
+    { title: 'Deception', author: 'Freda Motten', url: 'http://www.deception.hk', like:2 },
   ]
 
   test.beforeEach(async ({ page, request }) => {
@@ -61,7 +61,7 @@ test.describe('test for exercise 5.23', () => {
       // loop to click the 'like' button
       for (let i=1; i<=blog.like; i++) {
 
-        await page.getByRole('button', { name: /like/i }).click()
+        await page.getByTestId('likeButton').click()
         await expect(page.getByTestId('numLikes')).toHaveText(String(i))
       }
 

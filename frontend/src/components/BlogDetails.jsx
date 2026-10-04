@@ -73,6 +73,7 @@ const BlogDetails = ({ blogs, updateLikes, loggedUsername, onDelete }) => {
         {/* show like button only user already logged in */}
         {loggedUsername && <Button
           id='likeButton'
+          data-testid='likeButton'
           variant="outlined"
           color='success'
           onClick={() => updateLikes(blog)}>like
@@ -81,6 +82,7 @@ const BlogDetails = ({ blogs, updateLikes, loggedUsername, onDelete }) => {
         {loggedUsername === blog.user?.username && (
           <Button
             id='removeButton'
+            data-testid='removeButton'
             variant="outlined"
             color='error'
             onClick={() => onDelete(blog)}>remove

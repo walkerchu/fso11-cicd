@@ -75,7 +75,7 @@ test.describe('test for exercise 5.22', () => {
 
       // confirm land on the correct page by assert the blog.title
       const newBlogTitle = page.getByTestId('blogTitle').filter({ hasText: blog.title })
-      await expect(newBlogTitle).toBeVisible({ timeout: 30000 })
+      await expect(newBlogTitle).toBeVisible()
 
       // assert the "remove" button is visible
       await expect(page.getByRole('button', { name: /remove/i })).toBeVisible()
@@ -102,7 +102,7 @@ test.describe('test for exercise 5.22', () => {
       await page.waitForURL('**/blogs/**')  // land on blogs list page
 
       const newBlogTitle = page.getByTestId('blogTitle').filter({ hasText: blog.title })
-      await expect(newBlogTitle).toBeVisible({ timeout: 30000 })
+      await expect(newBlogTitle).toBeVisible()
 
       await expect(page.getByRole('button', { name: /remove/i })).not.toBeVisible()
       // await page.getByRole('link', { name: 'blogs' }).click()

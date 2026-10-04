@@ -26,9 +26,9 @@ test.describe('test for exercise 5.23', () => {
   }
 
   const testBlogs =[
-    { title: 'Pancakes', author: 'Michael Chan', url: 'http://www.pancakes.hk', like:7 },
-    { title: 'Carbuncles', author: 'Michael Chan', url: 'http://www.carbuncles.hk', like:2 },
-    { title: 'Deception', author: 'Michael Chan', url: 'http://www.deception.hk', like:5 },
+    { title: 'Pancakes', author: 'Michael Chan', url: 'http://www.pancakes.hk', like:4 },
+    { title: 'Carbuncles', author: 'Michael Chan', url: 'http://www.carbuncles.hk', like:1 },
+    { title: 'Deception', author: 'Michael Chan', url: 'http://www.deception.hk', like:2 },
   ]
 
   test.beforeEach(async ({ page, request }) => {
@@ -43,18 +43,18 @@ test.describe('test for exercise 5.23', () => {
   test('blogs are ordered by likes', async ({ page }) => {
 
     await loginWith(page, testUser.username, testUser.password)
-    await expect(page.getByRole('button', { name: /logout/i })).toBeVisible()
+    await expect(page.getByTestId('logoutButton')).toBeVisible()
 
     for (const blog of testBlogs) {
       await createBlog(page, blog)
     }
     // assert blogs have successfully inserted
-    await expect(page.locator('a.blog_row')).toHaveCount(testBlogs.length)
+    await expect(page.getByTestId('blogRowLink')).toHaveCount(testBlogs.length)
 
     // goto details block and click like button
     for (const blog of testBlogs) {
 
-      const blogLink = page.locator('a.blog_row').filter({ hasText: blog.title })
+      const blogLink = page.getByTestId('blogRowLink').filter({ hasText: blog.title })
       await blogLink.click()
       await page.waitForURL('**/blogs/**')
 
@@ -66,7 +66,7 @@ test.describe('test for exercise 5.23', () => {
       }
 
       // back to blog list page
-      await page.getByRole('link', { name: 'blogs' }).click()
+      await page.getByTestId('blogsLink').click()
       await page.waitForURL(url => url.pathname === '/')
     }
 
@@ -78,7 +78,8 @@ test.describe('test for exercise 5.23', () => {
     // put assertion inside expect.poll() is to
     // avoid flakiness risk caused by .allInnerTexts()
     await expect.poll(async () => {
-      const actualTexts = await page.locator('a.blog_row').allInnerTexts()
+      const actualTexts = await page.getByTestId('blogRowLink').allInnerTexts()
+
       return actualTexts.map(text =>
         testBlogs.find(blog => text.includes(blog.title))?.title
       )

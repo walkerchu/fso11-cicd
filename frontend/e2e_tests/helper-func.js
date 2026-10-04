@@ -11,35 +11,40 @@
 // 3. exercise 11.21: Your own pipeline (Oct 1, 2026)
 //    -> fix issues after combining frontend and backend
 
+import { expect } from '@playwright/test'
 
 const loginWith = async (page, username, password) => {
-  await page.getByLabel('username').fill(username)
-  await page.getByLabel('password').fill(password)
-  await page.getByRole('button', { name: 'login' }).click()
+  await page.getByTestId('usernameInput').fill(username)
+  await page.getByTestId('passwordInput').fill(password)
+  await page.getByTestId('loginButton').click()
 }
 
 const createBlog = async (page, blog) => {
-  await page.getByRole('link', { name: 'new blog' }).click()
-  await page.waitForURL('**/create')
-  const createPageHeader = page.locator('h3', 'create new')
-  await createPageHeader.waitFor({ state: 'visible', timeout: 10000 })
+  await expect(page.getByTestId('createLink')).toBeVisible({ timeout: 30000 })
+  await page.getByTestId('createLink').click()
+  await page.waitForURL(/\/create$/)
+  await expect(page.getByTestId('createNewHeader')).toBeVisible({ timeout: 30000 })
 
-  const inputTitle = await page.getByRole('textbox',{ name: 'title' })
-  await inputTitle.waitFor({ state: 'visible', timeout: 10000 })
+  const inputTitle = page.getByTestId('titleInput' )
+  await inputTitle.waitFor({ state: 'visible', timeout: 30000 })
   await inputTitle.fill(blog.title)
 
-  const inputAuthor = await page.getByRole('textbox',{ name: 'author' })
-  await inputAuthor.waitFor({ state: 'visible', timeout: 10000 })
+  const inputAuthor = page.getByTestId('authorInput' )
+  await inputAuthor.waitFor({ state: 'visible', timeout: 30000 })
   await inputAuthor.fill(blog.author)
 
-  const inputUrl = await page.getByRole('textbox',{ name: 'url' })
-  await inputUrl.waitFor({ state: 'visible', timeout: 10000 })
+  const inputUrl = page.getByTestId('urlInput' )
+  await inputUrl.waitFor({ state: 'visible', timeout: 30000 })
   await inputUrl.fill(blog.url)
 
   await page.getByRole('button', { name: 'create' }).click()
-  const blogLink = page.locator('a.blog_row').filter({ hasText: blog.title })
-  await blogLink.waitFor({ state: 'visible', timeout: 10000 })
 
+  // Wait for backend response before checking UI
+  await page.waitForResponse(resp =>
+    resp.url().includes('/api/blogs') && resp.status() === 201)
+
+  const blogLink = page.getByTestId('blogRowLink').filter({ hasText: blog.title })
+  await blogLink.waitFor({ state: 'visible', timeout: 30000 })
 }
 
 export { loginWith, createBlog }

@@ -43,11 +43,15 @@ const BlogForm = ({ createBlog }) => {
           label='title'
           type='text'
           value={title}
-          required pattern=".*\S.*"
-          title="Please enter a valid title (cannot be empty or spaces only)"
+          // required
           onChange={({ target }) => setTitle(target.value)}
           style={{ marginBottom: 10, minWidth:400 }}
           variant='outlined'
+          slotProps={{ htmlInput: {
+            'data-testid': 'titleInput',
+            // pattern:'.*\\S.*',
+            // title:'Please enter a valid title (cannot be empty or spaces only)'
+          } }}
           size="small" />
       </div>
       <div>
@@ -58,6 +62,8 @@ const BlogForm = ({ createBlog }) => {
           onChange={({ target }) => setAuthor(target.value)}
           style={{ marginBottom: 10, minWidth:400 }}
           variant='outlined'
+          slotProps={{ htmlInput: {
+            'data-testid': 'authorInput', } }}
           size="small" />
 
       </div>
@@ -66,15 +72,16 @@ const BlogForm = ({ createBlog }) => {
           label='url'
           type='text'
           value={url}
-          required
+          // required
           onChange={({ target }) => setURL(target.value)}
           style={{ marginBottom: 10, minWidth:400 }}
           variant='outlined'
           size="small"
           slotProps={{
             htmlInput: {
-              pattern: '.*\\S.*',
-              title: 'Please enter a valid title (cannot be empty or spaces only)',
+              'data-testid': 'urlInput',
+              // pattern: '.*\\S.*',
+              // title: 'Please enter a valid title (cannot be empty or spaces only)',
             },
           }}
         />
@@ -84,6 +91,7 @@ const BlogForm = ({ createBlog }) => {
         type='submit'
         variant="contained"
         id='createButton'
+        data-testid='createButton'
         style={{ marginTop: 10 }}>create
       </Button>
     </form>

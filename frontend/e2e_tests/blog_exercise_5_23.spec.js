@@ -38,9 +38,11 @@ test.describe('test for exercise 5.23', () => {
 
     console.log(`running: ${test.info().title}`)
     await page.goto('http://localhost:5173/login')
+    await page.waitForLoadState('networkidle')
+    await expect(page.getByTestId('loginHeader')).toBeVisible() // log in to application
   })
 
-  test('blogs are ordered by likes', async ({ page }) => {
+  test('5.23.1 blogs are ordered by likes', async ({ page }) => {
 
     await loginWith(page, testUser.username, testUser.password)
     await expect(page.getByTestId('logoutButton')).toBeVisible()
@@ -49,6 +51,7 @@ test.describe('test for exercise 5.23', () => {
       await createBlog(page, blog)
     }
     // assert blogs have successfully inserted
+    await expect(page.getByTestId('blogsHeader')).toBeVisible() // verify land on Blogs List page
     await expect(page.getByTestId('blogRowLink')).toHaveCount(testBlogs.length)
 
     // goto details block and click like button
@@ -57,6 +60,7 @@ test.describe('test for exercise 5.23', () => {
       const blogLink = page.getByTestId('blogRowLink').filter({ hasText: blog.title })
       await blogLink.click()
       await page.waitForURL('**/blogs/**')
+      await page.waitForLoadState('networkidle')
 
       // loop to click the 'like' button
       for (let i=1; i<=blog.like; i++) {
@@ -68,6 +72,8 @@ test.describe('test for exercise 5.23', () => {
       // back to blog list page
       await page.getByTestId('blogsLink').click()
       await page.waitForURL(url => url.pathname === '/')
+      await page.waitForLoadState('networkidle')
+      await expect(page.getByTestId('blogsHeader')).toBeVisible()
     }
 
     // Sort testBlogs dynamically in descending order of likes

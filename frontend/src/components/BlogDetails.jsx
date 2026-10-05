@@ -45,6 +45,7 @@ const BlogDetails = ({ blogs, updateLikes, loggedUsername, onDelete }) => {
 
       <Link
         className="blog_details"
+        data-testid='blogUrl'
         href={blog.url}
         sx={{ mt: 1, mb: 2 }}
       >{blog.url}</Link>

@@ -26,15 +26,18 @@ const createBlog = async (page, blog) => {
   await expect(page.getByTestId('createNewHeader')).toBeVisible()
 
   const inputTitle = page.getByTestId('titleInput' )
-  // await inputTitle.waitFor({ state: 'visible' })
+  await expect(inputTitle).toBeVisible()
+  await expect(inputTitle).toBeEnabled()
   await inputTitle.fill(blog.title)
 
   const inputAuthor = page.getByTestId('authorInput' )
-  // await inputAuthor.waitFor({ state: 'visible' })
+  await expect(inputAuthor).toBeVisible()
+  await expect(inputAuthor).toBeEnabled()
   await inputAuthor.fill(blog.author)
 
   const inputUrl = page.getByTestId('urlInput' )
-  // await inputUrl.waitFor({ state: 'visible' })
+  await expect(inputUrl).toBeVisible()
+  await expect(inputUrl).toBeEnabled()
   await inputUrl.fill(blog.url)
 
   await page.getByTestId('createButton').click()

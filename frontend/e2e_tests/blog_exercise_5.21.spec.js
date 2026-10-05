@@ -52,7 +52,7 @@ test.beforeEach(async ({ page, request }) => {
 test.describe('test for exercise 5.21', () => {
 
   // exercise 11.21: rewrite the test as 'create' form is moved
-  test('blog can be liked after login', async ({ page }) => {
+  test('5.21.1 blog can be liked after login', async ({ page }) => {
 
     await loginWith(page, testUser.username, testUser.password)
     await expect(page.getByTestId('logoutButton')).toBeVisible()
@@ -76,7 +76,7 @@ test.describe('test for exercise 5.21', () => {
   })
 
   // exercise 11.21: add new test for before login section
-  test('no like button if does not login', async ({ page }) => {
+  test('5.21.2 no like button if does not login', async ({ page }) => {
 
     await expect(page.getByTestId('loginHeader')).toContainText('log in to application')
 

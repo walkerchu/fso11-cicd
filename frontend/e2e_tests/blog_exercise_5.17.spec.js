@@ -25,23 +25,23 @@
 import { test, expect } from '@playwright/test'
 
 // exercise 5.17: login page is displayed by default
-test.describe('test for exercise 5.17', () => {
+test.describe('5.17.1 test for exercise 5.17', () => {
 
   test.beforeEach(async ({ page }) => {
     console.log(`running: ${test.info().title}`)
     await page.goto('http://localhost:5173')
   })
 
-  test('page title is correct', async ({ page }) => {
+  test('5.17.2 page title is correct', async ({ page }) => {
     const title = await page.title()
     expect(title).toBe('Full Stack Open - part 11')
   })
 
-  test('header is correct', async ({ page }) => {
+  test('5.17.3 header is correct', async ({ page }) => {
     await expect(page.getByTestId('blogsHeader')).toBeVisible() // blogs
   })
 
-  test('input box and button labels are correct', async ({ page }) => {
+  test('5.17.4 input box and button labels are correct', async ({ page }) => {
     await page.getByTestId('loginLink').click()
     await page.waitForURL(/\/login$/)
 

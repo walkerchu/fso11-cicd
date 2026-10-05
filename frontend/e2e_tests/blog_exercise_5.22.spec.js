@@ -38,7 +38,7 @@ test.describe('test for exercise 5.22', () => {
     { title: 'Cooking Past', author: 'Chloe Chan', url: 'http://www.cooking.com', },
   ]
 
-  test('only blog-creator can see delete button', async ({ page, request }) => {
+  test('5.22.1 only blog-creator can see delete button', async ({ page, request }) => {
 
     console.log(`running: ${test.info().title}`)
 
@@ -51,10 +51,14 @@ test.describe('test for exercise 5.22', () => {
 
     await page.goto('http://localhost:5173/login')  // login page
     await page.waitForURL(/\/login$/)
+    await page.waitForLoadState('networkidle')
+    await expect(page.getByTestId('loginHeader')).toBeVisible() // log in to application
 
     // 1st user login and create two blogs
     await loginWith(page, testUsers[0].username, testUsers[0].password)
     await expect(page.getByTestId('logoutButton')).toBeVisible()
+    await page.waitForLoadState('networkidle')
+    await expect(page.getByTestId('blogsHeader')).toBeVisible()
 
     for (let j=0; j<testBlogs.length; j++) {
       await createBlog(page, testBlogs[j])
@@ -72,22 +76,25 @@ test.describe('test for exercise 5.22', () => {
 
       // wait for the URL path to change to the details page route
       await page.waitForURL('**/blogs/**')
+      await page.waitForLoadState('networkidle')
 
       // confirm land on the correct page by assert the blog.title
       const newBlogTitle = page.getByTestId('blogTitle').filter({ hasText: blog.title })
       await expect(newBlogTitle).toBeVisible()
 
       // assert the "remove" button is visible
-      await expect(page.getByRole('button', { name: /remove/i })).toBeVisible()
+      await expect(page.getByTestId('removeButton')).toBeVisible()
 
       // click 'blogs' menu link and back to blog list page
-      await page.getByRole('link', { name: 'blogs' }).click()
+      await page.getByTestId('blogsLink').click()
       await page.waitForURL(url => url.pathname === '/')
     }
 
     // 1st user logout
     await page.getByTestId('logoutButton').click()
     await page.waitForURL(/\/login$/)  // wait for landing on before login apge
+    await page.waitForLoadState('networkidle')
+    await expect(page.getByTestId('loginHeader')).toBeVisible() // log in to application
 
     // then 2nd user login
     await loginWith(page, testUsers[1].username, testUsers[1].password)
@@ -100,16 +107,19 @@ test.describe('test for exercise 5.22', () => {
       await blogLink.click()
 
       await page.waitForURL('**/blogs/**')  // land on blogs list page
+      await page.waitForLoadState('networkidle')
 
       const newBlogTitle = page.getByTestId('blogTitle').filter({ hasText: blog.title })
       await expect(newBlogTitle).toBeVisible()
 
-      await expect(page.getByRole('button', { name: /remove/i })).not.toBeVisible()
-      // await page.getByRole('link', { name: 'blogs' }).click()
+      await expect(page.getByTestId('removeButton')).not.toBeVisible()
 
       // back to blog list page by clicking 'blogs' menu item
       page.getByTestId('blogsLink').click()
       await page.waitForURL(url => url.pathname === '/')
+      await page.waitForLoadState('networkidle')
+      await expect(page.getByTestId('blogsHeader')).toBeVisible() // blogs
+
     }
   })
 })

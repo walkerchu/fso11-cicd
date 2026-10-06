@@ -22,7 +22,7 @@ const loginWith = async (page, username, password) => {
 const createBlog = async (page, blog) => {
   await expect(page.getByTestId('createLink')).toBeVisible()
   await page.getByTestId('createLink').click()
-  // await page.waitForURL(/\/create$/)
+  await page.waitForLoadState('networkidle')
   await expect(page.getByTestId('createNewHeader')).toBeVisible()
 
   const inputTitle = page.getByTestId('titleInput' )

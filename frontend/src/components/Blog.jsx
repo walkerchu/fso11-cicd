@@ -21,7 +21,10 @@ const Blog = ({ blog }) => {
 
   return (
     <>
-      <Link to={`/blogs/${blog.id}`} className="blog_row">
+      <Link
+        to={`/blogs/${blog.id}`}
+        className="blog_row"
+        data-testid="blogRowLink">
         <ul>
           <li>{blog.title} by {blog.author}</li>
         </ul>

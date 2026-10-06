@@ -13,9 +13,9 @@ import { defineConfig, devices } from '@playwright/test'
  * @see https://playwright.dev/docs/test-configuration
  */
 export default defineConfig({
-  testDir: './tests',
+  testDir: './e2e_tests',
   /* Run tests in files in parallel */
-  fullyParallel: true,
+  fullyParallel: false,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
@@ -23,16 +23,41 @@ export default defineConfig({
   /* Opt out of parallel tests on CI. */
   /* Full Stack Open - Part 5: use 1 worker if not on CI */
   workers: process.env.CI ? 1 : 1,
+  timeout: 300000,    // per-test timeout -> 5 minutes
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: 'html',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('')`. */
-    // baseURL: 'http://localhost:3000',
-
+    baseURL: 'http://localhost:5173',
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
+    actionTimeout: 60000,        // action (click/fill) timeout 60s
+    navigationTimeout: 120000,   // navigation timeout 120s
+    screenshot: 'only-on-failure',
   },
+  expect: {
+    timeout: 10000, // 10 seconds for all expect assertions
+  },
+  webServer: [
+    {
+      command: 'pnpm run start-test:backend', // Command to start backend server in test mode
+      cwd: '..',
+      url: 'http://127.0.0.1:3003/health',
+      reuseExistingServer: !process.env.CI,
+      timeout: 180 * 1000,
+      stdout: 'pipe',
+      stderr: 'pipe',
+    },
+    {
+      command: 'pnpm run dev',
+      url: 'http://127.0.0.1:5173',
+      reuseExistingServer: !process.env.CI,
+      timeout: 180 * 1000,
+      stdout: 'pipe',
+      stderr: 'pipe',
+    },
+  ],
 
   /* Configure projects for major browsers */
   projects: [
@@ -81,4 +106,3 @@ export default defineConfig({
   //   reuseExistingServer: !process.env.CI,
   // },
 })
-

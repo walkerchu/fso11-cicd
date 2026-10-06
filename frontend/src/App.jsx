@@ -62,8 +62,6 @@ import {
 import * as styles from './materialStyles'
 
 
-// import './index.css'
-
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('')
@@ -99,11 +97,16 @@ const App = () => {
       setUser(user)
       setUsername('')
       setPassword('')
+      navigate('/')  // exercise 11.21 : move to here
 
       // Fetch fresh blog list from server after logging in
       const freshBlogs = await blogService.getAll()
       setBlogs(freshBlogs)
-      navigate('/')
+
+      // exercise 11.21: to fix the delayed redirect in the app,
+      // navigate immediately after successful login, before the
+      // awaited blog-list fetch, and avoid navigating again afterward
+      // navigate('/')
 
     } catch {
       setNotifyMessage({ message: 'wrong username or password', notifyType: 'error' })
@@ -242,7 +245,7 @@ const App = () => {
               sx={styles.navButtonStyle}
               component={Link}
               to="/"
-              id='blogsLink'>blogs
+              data-testid='blogsLink'>blogs
             </Button>
 
             {user ? (
@@ -252,14 +255,14 @@ const App = () => {
                   sx={styles.navButtonStyle}
                   component={Link}
                   to="/create"
-                  id='createLink'>new blog
+                  data-testid='createLink'>new blog
                 </Button>
 
                 <Button
                   color="inherit"
                   sx={styles.navButtonStyle}
                   type="button"
-                  id="logoutButton"
+                  data-testid="logoutButton"
                   onClick={handleLogout}>logout
                 </Button>
               </>
@@ -268,8 +271,8 @@ const App = () => {
                 color="inherit"
                 sx={styles.navButtonStyle}
                 component={Link}
-                to="/login">
-                <span id='loginLink'>login</span>
+                to="/login"
+                data-testid='loginLink'>login
               </Button>
             )}
 
@@ -284,7 +287,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={
           <div>
-            <h3>blogs</h3>
+            <h3 data-testid='blogsHeader'>blogs</h3>
 
             {/* exercise 5.8: add 'updateLikes' to pass handler prop
                 exercise 5.10: sort the blogs by number of likes
@@ -297,7 +300,7 @@ const App = () => {
 
         <Route path="/login" element={
           <div>
-            <h2>log in to application</h2>
+            <h2 data-testid='loginHeader'>log in to application</h2>
             {/* exercise 5.4: relocate banner position */}
             <form onSubmit={handleLogin}>
               <div>
@@ -308,7 +311,9 @@ const App = () => {
                   onChange={({ target }) => setUsername(target.value)}
                   style={{ marginBottom: 10, minWidth:300 }}
                   variant='standard'
-                  slotProps={{ htmlInput: { maxLength: 20 } }}
+                  slotProps={{ htmlInput: {
+                    'data-testid': 'usernameInput',
+                    maxLength: 20 } }}
                 />
               </div>
               <div>
@@ -319,13 +324,16 @@ const App = () => {
                   onChange={({ target }) => setPassword(target.value)}
                   style={{ marginBottom: 10, minWidth:300 }}
                   variant='standard'
-                  slotProps={{ htmlInput: { maxLength: 20 } }}
+                  slotProps={{ htmlInput: {
+                    'data-testid': 'passwordInput',
+                    maxLength: 20 } }}
                 />
               </div>
               <Button
                 type="submit"
                 variant="contained"
                 id="loginButton"
+                data-testid='loginButton'
                 style={{ marginTop: 10 }}>login</Button>
             </form>
 
@@ -345,7 +353,7 @@ const App = () => {
         <Route path="/create" element={
           user ? (
             <>
-              <h3>create new</h3>
+              <h3 data-testid='createNewHeader'>create new</h3>
               <BlogForm createBlog={handleCreate} />
             </>
           ) : (

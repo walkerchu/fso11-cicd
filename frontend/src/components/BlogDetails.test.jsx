@@ -6,6 +6,8 @@
 // Change log :
 // 1. exercise 5.27: routed blogs, step 4 (Sept 18, 2026)
 //    -> tests the single blog view by using Vitest
+// 2. exercise 11.21: Your own pipeline (Oct 1, 2026)
+//    -> fix issues after combining frontend and backend
 
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -45,7 +47,8 @@ const renderBlogDetails = (loggedUsername) => {
   )
 }
 
-const user = userEvent.setup()
+
+let user
 const updateLikes = vi.fn()
 const onDelete = vi.fn()
 
@@ -54,22 +57,25 @@ describe('exercise 5.27a: logged in user = author', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    user = userEvent.setup()
     renderBlogDetails('johndoe')
   })
 
-  test('header is correct', async () => {
-    const header = screen.getByText(`${blog.author}: ${blog.title}`)
+  // exercise 11.21: remove ${blog.author} from header
+  test('header is correct', () => {
+    const header = screen.getByText(`${blog.title}`)
     expect(header).toBeVisible()
   })
 
   test('url is rendered', () => {
-    const url = screen.queryByText(blog.url)
+    const url = screen.getByText(blog.url)
     expect(url).toBeVisible()
   })
 
+  // exercise 11.21: change to use .getByTestId()
   test('likes is rendered', () => {
-    const likes = screen.queryByText(`${blog.likes} likes`)
-    expect(likes).toBeVisible()
+    const likes = screen.getByTestId('numLikes')
+    expect(Number(likes.textContent)).toBe(blog.likes)
   })
 
   test('user.name is rendered', () => {
@@ -79,14 +85,24 @@ describe('exercise 5.27a: logged in user = author', () => {
 
   test('like button is clickable', async () => {
 
-    const likeButton = screen.queryByRole('button', { name: /like/i })
+    const likeButton = screen.getByRole('button', { name: /like/i })
     await user.click(likeButton)
     expect(updateLikes).toHaveBeenCalledTimes(1)
   })
 
+  // exercise 11.21: add new test to click like button twice
+  test('clicking like button twice', async () => {
+    const likeButton = screen.getByRole('button', { name: /like/i })
+
+    await user.click(likeButton)
+    expect(updateLikes).toHaveBeenCalledTimes(1)
+    await user.click(likeButton)
+    expect(updateLikes).toHaveBeenCalledTimes(2)
+  })
+
   test('remove button is clickable', async () => {
 
-    const removeButton = screen.queryByRole('button', { name: /remove/i })
+    const removeButton = screen.getByRole('button', { name: /remove/i })
     await user.click(removeButton)
     expect(onDelete).toHaveBeenCalledTimes(1)
   })
@@ -97,19 +113,20 @@ describe('exercise 5.27b: logged in user != author', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    user = userEvent.setup()
     renderBlogDetails('cannyhsu')
   })
 
   test('like button is rendered and clickable', async () => {
-    const likeButton = screen.queryByRole('button', { name: /like/i })
-    await expect(likeButton).toBeVisible()
+    const likeButton = screen.getByRole('button', { name: /like/i })
+    expect(likeButton).toBeVisible()
 
     await user.click(likeButton)
     expect(updateLikes).toHaveBeenCalledTimes(1)
 
   })
 
-  test('remove button is not rendered', async () => {
+  test('remove button is not rendered', () => {
     const removeButton = screen.queryByRole('button', { name: /remove/i })
     expect(removeButton).not.toBeInTheDocument()
   })
@@ -120,15 +137,17 @@ describe('exercise 5.27b: logged in user != author', () => {
 describe('exercise 5.27c: user does not logged in', () => {
 
   beforeEach(() => {
+    vi.clearAllMocks()
+    user = userEvent.setup()
     renderBlogDetails(null)
   })
 
-  test('like button is not rendered', async () => {
+  test('like button is not rendered', () => {
     const likeButton = screen.queryByRole('button', { name: /like/i })
     expect(likeButton).not.toBeInTheDocument()
   })
 
-  test('remove button is not rendered', async () => {
+  test('remove button is not rendered', () => {
     const removeButton = screen.queryByRole('button', { name: /remove/i })
     expect(removeButton).not.toBeInTheDocument()
   })

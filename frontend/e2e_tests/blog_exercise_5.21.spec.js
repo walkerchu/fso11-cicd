@@ -47,6 +47,7 @@ test.beforeEach(async ({ page, request }) => {
 
   await page.goto('http://localhost:5173/login')
   await page.waitForURL(/\/login$/)
+  await page.waitForLoadState('networkidle')
 })
 
 test.describe('test for exercise 5.21', () => {
@@ -56,6 +57,7 @@ test.describe('test for exercise 5.21', () => {
 
     await loginWith(page, testUser.username, testUser.password)
     await expect(page.getByTestId('logoutButton')).toBeVisible()
+    await page.waitForLoadState('networkidle')
     await createBlog(page, testBlog)
 
     const blogLink = page.getByTestId('blogRowLink').filter({ hasText: testBlog.title })
@@ -83,6 +85,7 @@ test.describe('test for exercise 5.21', () => {
     // login and create new blog
     await loginWith(page, testUser.username, testUser.password)
     await expect(page.getByTestId('logoutButton')).toBeVisible()
+    await page.waitForLoadState('networkidle')
     await createBlog(page, testBlog)  // create new blog
 
     // logout

@@ -31,21 +31,20 @@ test.describe('test for exercise 5.23', () => {
     { title: 'Deception', author: 'Freda Motten', url: 'http://www.deception.hk', like:2 },
   ]
 
-  test.beforeEach(async ({ page, request }) => {
+  test('5.23.1 blogs are ordered by likes', async ({ page, request }) => {
+
+    console.log(`running: ${test.info().title}`)
 
     await request.post('http://localhost:3003/api/testing/reset')
     await request.post('http://localhost:3003/api/users', { data: testUser })
 
-    console.log(`running: ${test.info().title}`)
     await page.goto('http://localhost:5173/login')
     await page.waitForLoadState('networkidle')
     await expect(page.getByTestId('loginHeader')).toBeVisible() // log in to application
-  })
-
-  test('5.23.1 blogs are ordered by likes', async ({ page }) => {
 
     await loginWith(page, testUser.username, testUser.password)
     await expect(page.getByTestId('logoutButton')).toBeVisible()
+    await page.waitForLoadState('networkidle')
 
     for (const blog of testBlogs) {
       await createBlog(page, blog)

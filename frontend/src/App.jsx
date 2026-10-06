@@ -97,11 +97,16 @@ const App = () => {
       setUser(user)
       setUsername('')
       setPassword('')
+      navigate('/')  // exercise 11.21 : move to here
 
       // Fetch fresh blog list from server after logging in
       const freshBlogs = await blogService.getAll()
       setBlogs(freshBlogs)
-      navigate('/')
+
+      // exercise 11.21: to fix the delayed redirect in the app,
+      // navigate immediately after successful login, before the
+      // awaited blog-list fetch, and avoid navigating again afterward
+      // navigate('/')
 
     } catch {
       setNotifyMessage({ message: 'wrong username or password', notifyType: 'error' })

@@ -22,6 +22,7 @@ const loginWith = async (page, username, password) => {
 const createBlog = async (page, blog) => {
   await expect(page.getByTestId('createLink')).toBeVisible()
   await page.getByTestId('createLink').click()
+  await expect(page).toHaveURL(/\/create$/)
   await page.waitForLoadState('networkidle')
 
   await Promise.all([

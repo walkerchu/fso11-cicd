@@ -23,23 +23,18 @@ const createBlog = async (page, blog) => {
   await expect(page.getByTestId('createLink')).toBeVisible()
   await page.getByTestId('createLink').click()
   await page.waitForLoadState('networkidle')
-  await expect(page.getByTestId('createNewHeader')).toBeVisible()
 
-  const inputTitle = page.getByTestId('titleInput' )
-  await expect(inputTitle).toBeVisible()
-  await expect(inputTitle).toBeEnabled()
-  await inputTitle.fill(blog.title)
+  await Promise.all([
+    expect(page.getByTestId('createNewHeader')).toBeVisible(),
+    expect(page.getByTestId('titleInput')).toBeEditable(),
+    expect(page.getByTestId('authorInput')).toBeEditable(),
+    expect(page.getByTestId('urlInput')).toBeEditable(),
+    expect(page.getByTestId('createButton')).toBeVisible(),
+  ])
 
-  const inputAuthor = page.getByTestId('authorInput' )
-  await expect(inputAuthor).toBeVisible()
-  await expect(inputAuthor).toBeEnabled()
-  await inputAuthor.fill(blog.author)
-
-  const inputUrl = page.getByTestId('urlInput' )
-  await expect(inputUrl).toBeVisible()
-  await expect(inputUrl).toBeEnabled()
-  await inputUrl.fill(blog.url)
-
+  await page.getByTestId('titleInput').fill(blog.title)
+  await page.getByTestId('authorInput').fill(blog.author)
+  await page.getByTestId('urlInput').fill(blog.url)
   await page.getByTestId('createButton').click()
 
   // Wait for backend response before checking UI

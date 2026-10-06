@@ -79,10 +79,11 @@ jobs:
         run: pnpm exec playwright install chromium --with-deps
         working-directory: frontend # exercise 11.21 added
 
-      - name: Wait 3 seconds
+      - name: Pause 2 seconds
+        # pause 2 seconds to wait for server fully start
         run: |
-          echo 'pause 3 seconds ...'
-          sleep 3
+          echo 'pause 2 seconds ...'
+          sleep 2
 
       - name: Run Playwright tests
         # exercise 11.21: use package.json sit in /frontend subfolder

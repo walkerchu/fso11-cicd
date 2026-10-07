@@ -1,0 +1,39 @@
+# Full Stack open: Continuous integration (part 11)
+# by The University of Helsinki
+# url : https://courses.mooc.fi/org/uh-cs/courses/full-stack-open-continuous-integration
+# created: Sept 28, 2026
+
+# Change Logs :
+# 1. Exercise 11.20: implement periodic health check
+# 2. Exercise 11.21: revise Render
+
+name: Periodic Hello
+
+on:
+    workflow_dispatch:
+    #disabled schedule after test to save quota
+    schedule:
+        - cron: "0 11,22 * * *"
+
+jobs:
+    periodic_check:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Check the deployed service URL
+              uses: jtalk/url-health-check-action@v5
+              with:
+                  # Check the following URLs one by one sequentially
+                  url: https://fso11-cicd-blog-app.onrender.com
+
+                  # Follow redirects, or just report success on 3xx status codes
+                  follow-redirect: false # Optional, defaults to "false"
+
+                  # Fail this action after this many failed attempts
+                  max-attempts: 3 # Optional, defaults to 1
+
+                  # Delay between retries
+                  retry-delay: 10s # Optional, only applicable to max-attempts > 1
+
+                  # Retry all errors, including 404. This option might trigger curl upgrade.
+                  retry-all: false # Optional, defaults to "false"
+

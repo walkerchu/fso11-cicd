@@ -5,15 +5,16 @@
 
 # Change Logs :
 # 1. Exercise 11.20: implement periodic health check
-# 2. Exercise 11.21: revise Render
+# 2. Exercise 11.21: revise Render.com url
 
 name: Periodic Hello
 
 on:
     workflow_dispatch:
-    #disabled schedule after test to save quota
-    schedule:
-        - cron: "0 11,22 * * *"
+    # disabled scheduled periodic health check to save quota
+    # if enabled, scheduled check will be runat 11:00 and 22:00 daily
+    # schedule:
+    #    - cron: "0 11,22 * * *"
 
 jobs:
     periodic_check:
